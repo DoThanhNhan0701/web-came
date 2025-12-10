@@ -2,20 +2,27 @@ import { ArrowRight, Eye, EyeOff, Lock, User } from "lucide-react-native";
 import React, { useState } from "react";
 import {
   ActivityIndicator,
+  Image,
   ScrollView,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
 import { twMerge } from "tailwind-merge";
 
+import { useDispatch, useSelector } from "react-redux";
+
+import Logo from "@/assets/images/logo.png";
 import ConditionalRender from "@/components/common/ConditionalRender";
 import { endpoints } from "@/services/endpoints";
 import { useMutation } from "@/services/useMutation";
+import { AppDispatch, RootState } from "@/store";
+import { actionFetchUser, actionLogin } from "@/store/slices/auth";
+import { handleApiError } from "@/utils/errorHandlers";
+import { Redirect } from "expo-router";
 import { Toast } from "toastify-react-native";
-// import Logo from "../../assets/icons/logo.png";
 
 type FormErrors = {
   username?: string;
@@ -23,6 +30,9 @@ type FormErrors = {
 };
 
 export default function LoginPage() {
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
+
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
   const [username, setUsername] = useState("");
@@ -64,26 +74,32 @@ export default function LoginPage() {
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
-    await loginMutation.mutate(
-      {
-        body: {
-          username,
-          password,
-        },
-      },
+    const { response, error } = await loginMutation.mutate(
+      { body: { username, password } },
       {
         onSuccess(result) {
-          Toast.success("Login successfully");
-          if (result && !result.data.is_lock) {
-            console.log(result);
-          }
-        },
-        onError(e) {
-          console.log(e);
+          if (result.data.is_lock) Toast.error("Your account has been locked");
+          else Toast.success("Login successfully");
         },
       }
     );
+
+    if (error) {
+      handleApiError(error);
+    }
+
+    if (response && !response.data.is_lock) {
+      dispatch(
+        actionLogin({
+          access_token: response.data.access,
+          refresh_token: response.data.refresh,
+        })
+      );
+      dispatch(actionFetchUser());
+    }
   };
+
+  if (user) return <Redirect href="/" />;
 
   return (
     <ScrollView
@@ -92,6 +108,7 @@ export default function LoginPage() {
     >
       <View className="w-full max-w-[448px] self-center">
         <View className="flex-row justify-center items-center mb-4 gap-2">
+          <Image source={Logo} className="w-9 h-9" alt="Logo" />
           <Text className="text-4xl font-bold text-black">SAFARI</Text>
         </View>
         <Text className="text-center text-[#6B7280] mb-12">
@@ -191,7 +208,10 @@ export default function LoginPage() {
               className="px-8 py-4 flex-row gap-3 items-center bg-[#2563EB] rounded-full w-[36%] justify-center"
             >
               <Text className="text-white text-lg font-semibold ">Sign in</Text>
-              <ConditionalRender condition={loginMutation.pending} childrenIfFalse={<ArrowRight size={24} color="#FFFFFF" />}>
+              <ConditionalRender
+                condition={loginMutation.pending}
+                childrenIfFalse={<ArrowRight size={24} color="#FFFFFF" />}
+              >
                 <ActivityIndicator size="small" color="#FFFFFF" />
               </ConditionalRender>
             </TouchableOpacity>

@@ -1,22 +1,23 @@
-import axios from "axios";
-
 import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from "@/constants/auth";
+import { store } from "@/store";
+import { actionLogout } from "@/store/slices/auth";
 import { getToken, setToken } from "@/utils/secureStore";
+import axios from "axios";
 import { endpoints } from "./endpoints";
 
+const PUBLIC_ENDPOINTS = ["/api/auth/login/"];
+
 const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}`,
   timeout: 60000,
 });
 
 axiosInstance.interceptors.request.use(
   async (config) => {
     const accessToken = await getToken(ACCESS_TOKEN);
-
     if (accessToken) {
       config.headers.Authorization = `Bearer ${accessToken}`;
     }
-
     return config;
   },
   (error) => Promise.reject(error)
@@ -24,46 +25,58 @@ axiosInstance.interceptors.request.use(
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-
   async (error) => {
     const { config, response } = error;
 
-    if (!response) throw error;
+    const isPublicEndpoint = PUBLIC_ENDPOINTS.some((endpoint) =>
+      config?.url?.includes(endpoint)
+    );
 
-    // If Unauthorized & not refreshing token
-    if (response.status === 401 && config.url !== endpoints.REFRESH_TOKEN) {
-      const refreshToken = await getToken(REFRESH_TOKEN);
-
-      if (!refreshToken) {
-        // store.dispatch(actionLogout());
-        throw error;
-      }
-
+    if (
+      response?.status === 401 &&
+      config?.url !== endpoints.REFRESH_TOKEN &&
+      !isPublicEndpoint
+    ) {
       try {
+        const refreshToken = await getToken(REFRESH_TOKEN);
+        if (!refreshToken || typeof refreshToken !== "string") {
+          store.dispatch(actionLogout());
+          return Promise.reject(
+            new Error("Session expired. Please login again.")
+          );
+        }
+
         const res = await axiosInstance.post(endpoints.REFRESH_TOKEN, {
           refresh: refreshToken,
         });
 
-        const newAccess = res?.data?.data?.access;
-        const newRefresh = res?.data?.data?.refresh;
+        const newAccessToken = res?.data?.data?.access;
+        const newRefreshToken = res?.data?.data?.refresh;
 
-        await setToken(ACCESS_TOKEN, newAccess);
-        await setToken(REFRESH_TOKEN, newRefresh);
+        if (!newAccessToken) {
+          throw new Error("No access token in refresh response");
+        }
+
+        await setToken(ACCESS_TOKEN, newAccessToken);
+        if (newRefreshToken) {
+          await setToken(REFRESH_TOKEN, newRefreshToken);
+        }
 
         axiosInstance.defaults.headers.common[
           "Authorization"
-        ] = `Bearer ${newAccess}`;
-        config.headers["Authorization"] = `Bearer ${newAccess}`;
+        ] = `Bearer ${newAccessToken}`;
+        config.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         return axiosInstance(config);
-      } catch (err) {
-        // store.dispatch(actionLogout());
-        console.error("Refresh token failed:", err);
-        throw err;
+      } catch (refreshError) {
+        store.dispatch(actionLogout());
+        return Promise.reject(
+          new Error("Session expired. Please login again.")
+        );
       }
     }
 
-    throw error;
+    return Promise.reject(error);
   }
 );
 

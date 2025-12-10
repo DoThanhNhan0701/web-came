@@ -16,7 +16,7 @@ export const endpoints = getEndPoint("api", {
   LOGIN: "auth/login",
   LOGOUT: "auth/logout",
   REFRESH_TOKEN: "auth/token/refresh",
-  ME: "me",
+  ME: "auth/me",
   ROLE: "role",
   USERS: "users",
 });

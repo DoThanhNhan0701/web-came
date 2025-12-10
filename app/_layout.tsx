@@ -1,10 +1,13 @@
+import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { router, Stack, usePathname } from "expo-router";
 import ToastManager from "toastify-react-native";
 
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { AppDispatch, RootState, store } from "@/store";
 import { actionFetchUser } from "@/store/slices/auth";
+
 import { Suspense, useEffect } from "react";
+import { View } from "react-native";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "./globals.css";
 
@@ -26,29 +29,41 @@ function AppContentInner() {
   }, []);
 
   useEffect(() => {
-    if (!loading && !user && pathname !== "/login") {
+    if (loading) return;
+
+    const isLoginPage = pathname === "/login";
+
+    if (!user && !isLoginPage) {
       router.replace("/login");
+      return;
+    }
+
+    if (user && isLoginPage) {
+      router.replace("/");
     }
   }, [loading, user, pathname]);
 
   if (loading) return <LoadingOverlay />;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-      }}
-    />
+    <View style={{ flex: 1 }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "fade",
+        }}
+      />
+    </View>
   );
 }
 
-function RootLayout() {
+export default function RootLayout() {
   return (
-    <Provider store={store}>
-      <ToastManager />
-      <AppContent />
-    </Provider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Provider store={store}>
+        <ToastManager />
+        <AppContent />
+      </Provider>
+    </GestureHandlerRootView>
   );
 }
-
-export default RootLayout;

@@ -103,7 +103,7 @@ export default function LoginPage() {
 
   return (
     <ScrollView
-      className="flex-1 bg-[#F9FAFB]"
+      className="flex-1 bg-white"
       contentContainerClassName="grow justify-center p-[18px]"
     >
       <View className="w-full max-w-[448px] self-center">

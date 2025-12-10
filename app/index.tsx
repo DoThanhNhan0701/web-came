@@ -1,13 +1,10 @@
-import { Text, View } from "react-native";
+import { Link } from "expo-router";
+import { View } from "react-native";
 
 export default function Index() {
   return (
-    <View className="bg-primary flex-1">
-      <Text className="text-3xl text-white">
-        Edit app/index.tsx to edit this screen.
-      </Text>
-
-      <Text>ABC</Text>
+    <View className="flex-1 justify-center items-center">
+      <Link href="/(auth)/login">Go to Login</Link>
     </View>
   );
 }

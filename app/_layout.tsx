@@ -6,7 +6,6 @@ import { AppDispatch, RootState, store } from "@/store";
 import { actionFetchUser } from "@/store/slices/auth";
 
 import { Suspense, useEffect } from "react";
-import { View } from "react-native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "./globals.css";
@@ -46,14 +45,12 @@ function AppContentInner() {
   if (loading) return <LoadingOverlay />;
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-          animation: "fade",
-        }}
-      />
-    </View>
+    <Stack
+      screenOptions={{
+        headerShown: false,
+        animation: "fade",
+      }}
+    />
   );
 }
 

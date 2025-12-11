@@ -1,6 +1,7 @@
-import { AppDispatch, RootState } from "@/store";
+import { AppDispatch } from "@/store";
 import { actionFetchUser, actionLogoutUser } from "@/store/slices/auth";
 import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import {
   BarChart3,
   LogOut,
@@ -19,10 +20,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 
 export default function HomeScreen() {
-  const { user } = useSelector((state: RootState) => state.auth);
   const dispatch = useDispatch<AppDispatch>();
   const [refreshing, setRefreshing] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -43,7 +43,7 @@ export default function HomeScreen() {
   };
 
   const handleCamera = () => {
-    console.log("Navigate to camera");
+    router.push("/(invoice)/list-invoice");
   };
 
   const handleLogout = () => {
@@ -54,42 +54,30 @@ export default function HomeScreen() {
   return (
     <View className="flex-1 bg-gray-50">
       <StatusBar barStyle="light-content" backgroundColor="#0f172a" />
-
-      {/* Modern Gradient Header */}
       <LinearGradient
-        colors={["#0f172a", "#1e293b", "#334155"]}
+        colors={["rgba(79, 70, 229, 0.9)", "rgba(124, 58, 237, 0.7)"]}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
-          paddingHorizontal: 24,
-          paddingVertical: 20,
-          elevation: 12,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 0.2,
-          shadowRadius: 12,
+          paddingTop: 48,
+          paddingBottom: 16,
+          paddingLeft: 16,
+          paddingRight: 16,
         }}
       >
-        <View className="flex-row items-center justify-between">
+        <View className="flex-row justify-between items-center">
           <View className="flex-1">
-            <Text className="text-white text-xl font-bold tracking-wide mb-1">
-              SCA Coop-Nhật Châu
+            <Text className="text-lg font-bold text-white mb-1">
+              Coop-Mart Hai Châu
             </Text>
-            <View className="flex-row items-center mt-1">
-              <View className="w-2 h-2 bg-emerald-400 rounded-full mr-2" />
-              <Text className="text-slate-300 text-sm font-medium">
-                {user?.full_name || "Đang tải..."}
-              </Text>
-            </View>
+            <Text className="text-sm text-white opacity-90">Bảng kê TPTS</Text>
           </View>
-
-          {/* User Avatar Button with Gradient */}
           <Pressable
             onPress={() => setShowUserMenu(true)}
             style={({ pressed }) => [
               {
-                width: 54,
-                height: 54,
+                width: 44,
+                height: 44,
                 borderRadius: 27,
                 alignItems: "center",
                 justifyContent: "center",
@@ -103,8 +91,8 @@ export default function HomeScreen() {
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
               style={{
-                width: 54,
-                height: 54,
+                width: 44,
+                height: 44,
                 borderRadius: 27,
                 alignItems: "center",
                 justifyContent: "center",
@@ -121,7 +109,6 @@ export default function HomeScreen() {
         </View>
       </LinearGradient>
 
-      {/* User Menu Popover - Enhanced */}
       <Modal
         visible={showUserMenu}
         transparent={true}
@@ -148,7 +135,6 @@ export default function HomeScreen() {
               overflow: "hidden",
             }}
           >
-            {/* User Info Section with Gradient Background */}
             <LinearGradient
               colors={["#f0f9ff", "#e0f2fe"]}
               start={{ x: 0, y: 0 }}
@@ -184,7 +170,6 @@ export default function HomeScreen() {
 
             <View className="h-px bg-gray-200" />
 
-            {/* Logout Button */}
             <TouchableOpacity
               onPress={handleLogout}
               className="flex-row items-center px-6 py-5 active:bg-red-50"
@@ -200,7 +185,6 @@ export default function HomeScreen() {
         </Pressable>
       </Modal>
 
-      {/* Main Content Area */}
       <ScrollView
         className="flex-1 bg-gradient-to-b from-blue-50/30 to-white"
         contentContainerStyle={{ flexGrow: 1 }}
@@ -216,9 +200,7 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View className="flex-1 justify-center items-center px-5 py-10">
-          {/* Action Buttons Container */}
           <View className="flex-row justify-center items-center w-full gap-5">
-            {/* Statistics Card - Enhanced */}
             <Pressable
               onPress={handleStatistics}
               className="items-center flex-1"
@@ -294,7 +276,6 @@ export default function HomeScreen() {
               </Text>
             </Pressable>
 
-            {/* Camera Card - Enhanced */}
             <Pressable
               onPress={handleCamera}
               className="items-center flex-1"
@@ -341,13 +322,11 @@ export default function HomeScreen() {
                     shadowRadius: 14,
                   }}
                 >
-                  {/* Camera Lens */}
                   <View className="bg-white rounded-full w-16 h-16 items-center justify-center">
                     <View className="bg-purple-200 rounded-full w-10 h-10 items-center justify-center">
                       <View className="bg-purple-600 rounded-full w-5 h-5" />
                     </View>
                   </View>
-                  {/* Camera Flash */}
                   <View
                     style={{
                       position: "absolute",
@@ -359,7 +338,6 @@ export default function HomeScreen() {
                       backgroundColor: "#6d28d9",
                     }}
                   />
-                  {/* Camera Viewfinder */}
                   <View
                     style={{
                       position: "absolute",
@@ -384,7 +362,6 @@ export default function HomeScreen() {
         </View>
       </ScrollView>
 
-      {/* Modern Footer with Gradient Accent */}
       <View
         style={{
           backgroundColor: "white",

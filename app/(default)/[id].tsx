@@ -58,7 +58,6 @@ export default function ScreenShotDetail() {
   }
 
   const handleCapture = async () => {
-    // Prevent multiple simultaneous captures
     if (isCapturing || !cameraRef.current) return;
 
     try {
@@ -68,7 +67,6 @@ export default function ScreenShotDetail() {
       });
       if (photo?.uri) {
         setCapturedPhotos((prev) => [...prev, photo.uri]);
-        // You can also save to device or upload here
       }
     } catch (error) {
       console.error("Error taking picture:", error);
@@ -85,124 +83,128 @@ export default function ScreenShotDetail() {
     <View className="flex-1 bg-black">
       <StatusBar barStyle="light-content" />
 
-      <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }}>
-        <LinearGradient
-          colors={["rgba(79, 70, 229, 0.9)", "rgba(124, 58, 237, 0.7)"]}
-          start={{ x: 0, y: 0 }}
-          end={{ x: 1, y: 1 }}
-          style={{
-            paddingTop: 48,
-            paddingBottom: 16,
-            paddingLeft: 16,
-            paddingRight: 16,
-          }}
-        >
-          <View className="flex-row justify-between items-center">
-            <View className="flex-1">
-              <Text className="text-lg font-bold text-white mb-1">
-                Coop-Mart Hai Châu
-              </Text>
-              <Text className="text-sm text-white opacity-90">
-                Bảng kê TPTS
-              </Text>
-            </View>
-            <TouchableOpacity className="w-11 h-11 rounded-xl bg-white/20 justify-center items-center">
-              <Ionicons name="grid-outline" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
+      <CameraView ref={cameraRef} facing={facing} style={{ flex: 1 }} />
+
+      <LinearGradient
+        colors={["rgba(79, 70, 229, 0.9)", "rgba(124, 58, 237, 0.7)"]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          right: 0,
+          paddingTop: 48,
+          paddingBottom: 16,
+          paddingLeft: 16,
+          paddingRight: 16,
+        }}
+      >
+        <View className="flex-row justify-between items-center">
+          <View className="flex-1">
+            <Text className="text-lg font-bold text-white mb-1">
+              Coop-Mart Hai Châu
+            </Text>
+            <Text className="text-sm text-white opacity-90">
+              Bảng kê TPTS
+            </Text>
           </View>
-        </LinearGradient>
-
-        <View className="absolute bottom-0 left-0 right-0 pb-0">
-          <View className="flex-row items-center justify-between px-4 py-5 bg-black/40">
-            <TouchableOpacity
-              className="w-11 h-11 rounded-full bg-white/20 justify-center items-center"
-              onPress={() => router.back()}
-              activeOpacity={0.8}
-            >
-              <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="rounded-3xl overflow-hidden"
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#4169E1", "#5B7FE8"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  maxWidth: 100,
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  className="text-[13px] font-semibold text-white text-center"
-                >
-                  Biên bản
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="items-center justify-center relative"
-              onPress={handleCapture}
-              activeOpacity={0.8}
-            >
-              <View className="w-[72px] h-[72px] rounded-full bg-white justify-center items-center border-4 border-white/30">
-                <View className="w-[60px] h-[60px] rounded-full bg-white" />
-              </View>
-              {capturedPhotos.length > 0 && (
-                <View className="absolute -top-2 -right-2 bg-red-500 rounded-xl min-w-6 h-6 justify-center items-center px-1.5 border-2 border-white">
-                  <Text className="text-xs font-bold text-white">
-                    {capturedPhotos.length}
-                  </Text>
-                </View>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="rounded-3xl overflow-hidden"
-              activeOpacity={0.8}
-            >
-              <LinearGradient
-                colors={["#4169E1", "#5B7FE8"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{
-                  paddingLeft: 20,
-                  paddingRight: 20,
-                  paddingTop: 12,
-                  paddingBottom: 12,
-                  maxWidth: 100,
-                }}
-              >
-                <Text
-                  numberOfLines={1}
-                  className="text-[13px] font-semibold text-white text-center"
-                >
-                  KTSSSS đợt 1
-                </Text>
-              </LinearGradient>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              className="w-11 h-11 rounded-full bg-white/20 justify-center items-center"
-              onPress={toggleCameraFacing}
-              activeOpacity={0.8}
-            >
-              <Ionicons
-                name="camera-reverse-outline"
-                size={24}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
-          </View>
+          <TouchableOpacity className="w-11 h-11 rounded-xl bg-white/20 justify-center items-center">
+            <Ionicons name="grid-outline" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
         </View>
-      </CameraView>
+      </LinearGradient>
+
+      <View className="absolute bottom-0 left-0 right-0 pb-0">
+        <View className="flex-row items-center justify-between px-4 py-5 bg-black/40">
+          <TouchableOpacity
+            className="w-11 h-11 rounded-full bg-white/20 justify-center items-center"
+            onPress={() => router.back()}
+            activeOpacity={0.8}
+          >
+            <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="rounded-3xl overflow-hidden"
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#4169E1", "#5B7FE8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 12,
+                paddingBottom: 12,
+                maxWidth: 100,
+              }}
+            >
+              <Text
+                numberOfLines={1}
+                className="text-[13px] font-semibold text-white text-center"
+              >
+                Biên bản
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="items-center justify-center relative"
+            onPress={handleCapture}
+            activeOpacity={0.8}
+          >
+            <View className="w-[72px] h-[72px] rounded-full bg-white justify-center items-center border-4 border-white/30">
+              <View className="w-[60px] h-[60px] rounded-full bg-white" />
+            </View>
+            {capturedPhotos.length > 0 && (
+              <View className="absolute -top-2 -right-2 bg-red-500 rounded-xl min-w-6 h-6 justify-center items-center px-1.5 border-2 border-white">
+                <Text className="text-xs font-bold text-white">
+                  {capturedPhotos.length}
+                </Text>
+              </View>
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="rounded-3xl overflow-hidden"
+            activeOpacity={0.8}
+          >
+            <LinearGradient
+              colors={["#4169E1", "#5B7FE8"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={{
+                paddingLeft: 20,
+                paddingRight: 20,
+                paddingTop: 12,
+                paddingBottom: 12,
+                maxWidth: 100,
+              }}
+            >
+              <Text
+                numberOfLines={1}
+                className="text-[13px] font-semibold text-white text-center"
+              >
+                KTSSSS đợt 1
+              </Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            className="w-11 h-11 rounded-full bg-white/20 justify-center items-center"
+            onPress={toggleCameraFacing}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name="camera-reverse-outline"
+              size={24}
+              color="#FFFFFF"
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 }

@@ -1,22 +1,13 @@
-import LoadingOverlay from "@/components/common/LoadingOverlay";
 import { router, Stack, usePathname } from "expo-router";
 import ToastManager from "toastify-react-native";
 
 import { AppDispatch, RootState, store } from "@/store";
 
 import { actionFetchUser } from "@/store/slices/auth";
-import { Suspense, useEffect } from "react";
+import { useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch, useSelector } from "react-redux";
 import "./globals.css";
-
-function AppContent() {
-  return (
-    <Suspense fallback={<LoadingOverlay />}>
-      <AppContentInner />
-    </Suspense>
-  );
-}
 
 function AppContentInner() {
   const pathname = usePathname();
@@ -57,7 +48,7 @@ export default function RootLayout() {
     <GestureHandlerRootView className="flex-1">
       <Provider store={store}>
         <ToastManager />
-        <AppContent />
+        <AppContentInner />
       </Provider>
     </GestureHandlerRootView>
   );

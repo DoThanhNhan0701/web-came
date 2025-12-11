@@ -1,9 +1,14 @@
 import { ACCESS_TOKEN, API_URL, REFRESH_TOKEN } from "@/constants/auth";
-import { store } from "@/store";
-import { actionLogout } from "@/store/slices/auth";
 import { getToken, setToken } from "@/utils/secureStore";
 import axios from "axios";
 import { endpoints } from "./endpoints";
+
+// Callback to handle logout - will be set during app initialization
+let logoutCallback: (() => void) | null = null;
+
+export const setLogoutCallback = (callback: () => void) => {
+  logoutCallback = callback;
+};
 
 const PUBLIC_ENDPOINTS = ["/api/auth/login/"];
 
@@ -40,7 +45,7 @@ axiosInstance.interceptors.response.use(
       try {
         const refreshToken = await getToken(REFRESH_TOKEN);
         if (!refreshToken || typeof refreshToken !== "string") {
-          store.dispatch(actionLogout());
+          logoutCallback?.();
           return Promise.reject(
             new Error("Session expired. Please login again.")
           );
@@ -69,7 +74,7 @@ axiosInstance.interceptors.response.use(
 
         return axiosInstance(config);
       } catch (refreshError) {
-        store.dispatch(actionLogout());
+        logoutCallback?.();
         return Promise.reject(
           new Error("Session expired. Please login again.")
         );

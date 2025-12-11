@@ -3,8 +3,8 @@ import { router, Stack, usePathname } from "expo-router";
 import ToastManager from "toastify-react-native";
 
 import { AppDispatch, RootState, store } from "@/store";
-import { actionFetchUser } from "@/store/slices/auth";
 
+import { actionFetchUser } from "@/store/slices/auth";
 import { Suspense, useEffect } from "react";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { Provider, useDispatch, useSelector } from "react-redux";
@@ -38,11 +38,9 @@ function AppContentInner() {
     }
 
     if (user && isLoginPage) {
-      router.replace("/");
+      router.replace("/(private)/");
     }
   }, [loading, user, pathname]);
-
-  if (loading) return <LoadingOverlay />;
 
   return (
     <Stack
@@ -56,7 +54,7 @@ function AppContentInner() {
 
 export default function RootLayout() {
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
+    <GestureHandlerRootView className="flex-1">
       <Provider store={store}>
         <ToastManager />
         <AppContent />

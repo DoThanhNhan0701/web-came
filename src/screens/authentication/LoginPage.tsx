@@ -99,7 +99,7 @@ export default function LoginPage() {
     }
   };
 
-  if (user) return <Redirect href="/" />;
+  if (user) return <Redirect href="/(private)/" />;
 
   return (
     <ScrollView

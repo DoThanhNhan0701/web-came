@@ -4,7 +4,7 @@ import { Pressable, Text, View } from "react-native";
 
 export default function HomePage() {
   const handleStatistics = () => {
-    router.push("/");
+    router.push("/(default)/statistics");
   };
 
   const handleCamera = () => {

@@ -4,8 +4,14 @@ import { useGet } from "@/services/requestData";
 import { ICategories } from "@/types/ICategories";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
-import React from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import React, { useState } from "react";
+import {
+  ActivityIndicator,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export interface IInvoice {
   id: string;
@@ -16,12 +22,16 @@ export interface IInvoice {
 }
 
 export default function ListInvoice() {
+  const [navigatingId, setNavigatingId] = useState<number | null>(null);
+
   const categoriesData = useGet<ICategories[]>(
     { url: `${endpoints.CATEGORIES}/` },
     { deps: [] }
   );
 
   const handleRedirectCamera = (id: number) => {
+    if (navigatingId) return;
+    setNavigatingId(id);
     router.push(`/(default)/${id}`);
   };
 
@@ -39,6 +49,7 @@ export default function ListInvoice() {
         activeOpacity={0.7}
         className="bg-white rounded-2xl mb-3"
         onPress={() => handleRedirectCamera(item.id)}
+        disabled={!!navigatingId}
       >
         <View className="flex-row items-center p-4">
           <View className="mr-4">
@@ -52,7 +63,11 @@ export default function ListInvoice() {
             </Text>
           </View>
           <View>
-            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            {navigatingId === item.id ? (
+              <ActivityIndicator size="small" color="#4F46E5" />
+            ) : (
+              <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
+            )}
           </View>
         </View>
       </TouchableOpacity>
@@ -74,13 +89,19 @@ export default function ListInvoice() {
         <View className="w-10" />
       </View>
 
-      <FlatList
-        data={categoriesData?.response ?? []}
-        renderItem={renderItem}
-        keyExtractor={(item) => item.id.toString()}
-        contentContainerClassName="p-4"
-        showsVerticalScrollIndicator={false}
-      />
+      {categoriesData?.pending ? (
+        <View className="flex-1 items-center justify-center">
+          <ActivityIndicator size="large" color="#4F46E5" />
+        </View>
+      ) : (
+        <FlatList
+          data={categoriesData?.response ?? []}
+          renderItem={renderItem}
+          keyExtractor={(item) => item.id.toString()}
+          contentContainerClassName="p-4"
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 }

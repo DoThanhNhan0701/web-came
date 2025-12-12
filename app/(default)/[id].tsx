@@ -13,12 +13,6 @@ import {
   View,
 } from "react-native";
 
-type UploadFile = {
-  uri: string;
-  name: string;
-  type: string;
-};
-
 export default function ScreenShotDetail() {
   const { id } = useLocalSearchParams();
 
@@ -28,7 +22,7 @@ export default function ScreenShotDetail() {
   const cameraRef = useRef<CameraView>(null);
 
   const invoiceMutation = useMutation({
-    url: `${endpoints.INVOICES}/r`,
+    url: `${endpoints.INVOICES}/`,
     method: "post",
   });
 
@@ -107,8 +101,6 @@ export default function ScreenShotDetail() {
     );
   }
 
-  console.log(invoiceMutation.pending);
-
   return (
     <View className="flex-1 bg-black">
       <StatusBar barStyle="light-content" />
@@ -182,9 +174,17 @@ export default function ScreenShotDetail() {
             className="items-center justify-center relative"
             onPress={handleCapture}
             activeOpacity={0.8}
+            disabled={isCapturing || invoiceMutation.pending}
+            style={{
+              opacity: isCapturing || invoiceMutation.pending ? 0.6 : 1,
+            }}
           >
             <View className="w-[72px] h-[72px] rounded-full bg-white justify-center items-center border-4 border-white/30">
-              <View className="w-[60px] h-[60px] rounded-full bg-white" />
+              {isCapturing || invoiceMutation.pending ? (
+                <ActivityIndicator size="large" color="#4F46E5" />
+              ) : (
+                <View className="w-[60px] h-[60px] rounded-full bg-white" />
+              )}
             </View>
           </TouchableOpacity>
 

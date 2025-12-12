@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "web-came",
-    "slug": "web-came",
+    "name": "Take a Photo",
+    "slug": "take-a-photo",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
-    "scheme": "webcame",
+    "icon": "./src/assets/icons/logo-take-a-photo.png",
+    "scheme": "take-a-photo",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
@@ -23,7 +23,7 @@
     },
     "web": {
       "output": "static",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./src/assets/icons/logo-take-a-photo.png"
     },
     "plugins": [
       "expo-router",

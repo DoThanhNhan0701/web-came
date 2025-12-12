@@ -1,12 +1,12 @@
 import { Toast } from "toastify-react-native";
 
 interface ApiError {
-  response?: { data?: { message?: string } };
+  response?: { data?: { detail?: string } };
 }
 
 const getErrorMessage = (error: unknown): string => {
   const apiError = error as ApiError;
-  return apiError.response?.data?.message ?? "Error";
+  return apiError?.response?.data?.detail ?? "Error";
 };
 
 export const handleApiError = (error: unknown) => {

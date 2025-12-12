@@ -10,7 +10,7 @@ export const setLogoutCallback = (callback: () => void) => {
   logoutCallback = callback;
 };
 
-const PUBLIC_ENDPOINTS = ["/api/auth/login/"];
+const PUBLIC_ENDPOINTS = ["/api/v1/auth/login"];
 
 const axiosInstance = axios.create({
   baseURL: `${API_URL}`,
@@ -39,24 +39,24 @@ axiosInstance.interceptors.response.use(
 
     if (
       response?.status === 401 &&
-      config?.url !== endpoints.REFRESH_TOKEN &&
+      config?.url !== endpoints.REFRESH &&
       !isPublicEndpoint
     ) {
       try {
         const refreshToken = await getToken(REFRESH_TOKEN);
+        console.log(refreshToken, "resfressToken");
+
         if (!refreshToken || typeof refreshToken !== "string") {
           logoutCallback?.();
-          return Promise.reject(
-            new Error("Session expired. Please login again.")
-          );
+          throw error(new Error("Session expired. Please login again."));
         }
 
-        const res = await axiosInstance.post(endpoints.REFRESH_TOKEN, {
-          refresh: refreshToken,
+        const res = await axiosInstance.post(endpoints.REFRESH, {
+          refresh_token: refreshToken,
         });
 
-        const newAccessToken = res?.data?.data?.access;
-        const newRefreshToken = res?.data?.data?.refresh;
+        const newAccessToken = res?.data?.access_token;
+        const newRefreshToken = res?.data?.refresh_token;
 
         if (!newAccessToken) {
           throw new Error("No access token in refresh response");
@@ -73,15 +73,13 @@ axiosInstance.interceptors.response.use(
         config.headers["Authorization"] = `Bearer ${newAccessToken}`;
 
         return axiosInstance(config);
-      } catch (refreshError) {
+      } catch {
         logoutCallback?.();
-        return Promise.reject(
-          new Error("Session expired. Please login again.")
-        );
+        throw error(new Error("Session expired. Please login again."));
       }
     }
 
-    return Promise.reject(error);
+    throw error;
   }
 );
 

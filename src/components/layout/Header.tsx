@@ -1,5 +1,5 @@
 import { AppDispatch, RootState } from "@/store";
-import { actionLogoutUser } from "@/store/slices/auth";
+import { actionLogout } from "@/store/slices/auth";
 import { LogOut, User } from "lucide-react-native";
 import { useState } from "react";
 import {
@@ -20,7 +20,7 @@ export default function Header() {
 
   const handleLogout = () => {
     setShowUserMenu(false);
-    dispatch(actionLogoutUser());
+    dispatch(actionLogout());
   };
 
   return (

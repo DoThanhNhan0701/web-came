@@ -8,7 +8,6 @@ import {
   type PayloadAction,
   createAsyncThunk,
   createSlice,
-  isAnyOf,
 } from "@reduxjs/toolkit";
 
 export const actionFetchUser = createAsyncThunk(
@@ -18,28 +17,11 @@ export const actionFetchUser = createAsyncThunk(
       const refreshToken = await getToken(REFRESH_TOKEN);
       if (!refreshToken) throw new Error("UNAUTHORIZE");
       const response = await axiosInstance.get(endpoints.ME);
-      return response.data.data;
+      return response.data;
     } catch (error) {
       return thunkApi.rejectWithValue({
         message: (error as Error).message,
       });
-    }
-  }
-);
-
-export const actionLogoutUser = createAsyncThunk(
-  "auth/logoutUser",
-  async (_, thunkApi) => {
-    try {
-      const refreshToken = await getToken(REFRESH_TOKEN);
-      if (!refreshToken) throw new Error("UNAUTHORIZE");
-      await axiosInstance.post(endpoints.LOGOUT, {
-        refresh_token: refreshToken,
-      });
-    } catch (error) {
-      return thunkApi.rejectWithValue(error);
-    } finally {
-      thunkApi.dispatch(actionLogout());
     }
   }
 );
@@ -91,17 +73,6 @@ const authSlice = createSlice({
       .addCase(actionFetchUser.rejected, (state) => {
         state.loading = false;
       });
-
-    builder
-      .addCase(actionLogoutUser.pending, (state) => {
-        state.loggingOut = true;
-      })
-      .addMatcher(
-        isAnyOf(actionLogoutUser.fulfilled, actionLogoutUser.rejected),
-        (state) => {
-          state.loggingOut = false;
-        }
-      );
   },
 });
 

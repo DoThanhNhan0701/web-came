@@ -3,7 +3,7 @@ const getEndPoint = <T extends Record<string, string>>(
   subEndpoint: T
 ) => {
   for (const key in subEndpoint) {
-    subEndpoint[key] = `/${baseURL}/${subEndpoint[key]}/` as T[Extract<
+    subEndpoint[key] = `/${baseURL}/${subEndpoint[key]}` as T[Extract<
       keyof T,
       string
     >];
@@ -12,11 +12,11 @@ const getEndPoint = <T extends Record<string, string>>(
   return subEndpoint;
 };
 
-export const endpoints = getEndPoint("api", {
+export const endpoints = getEndPoint("api/v1", {
+  ME: "auth/me",
   LOGIN: "auth/login",
   LOGOUT: "auth/logout",
-  REFRESH_TOKEN: "auth/token/refresh",
-  ME: "auth/me",
+  REFRESH: "auth/refresh",
   ROLE: "role",
   USERS: "users",
 });

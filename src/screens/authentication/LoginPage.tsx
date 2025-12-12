@@ -40,15 +40,9 @@ export default function LoginPage() {
   const [errors, setErrors] = useState<FormErrors>({});
 
   const loginMutation = useMutation<{
-    data: {
-      access: string;
-      refresh: string;
-      token_type: string;
-      expires_in: number;
-      is_lock: boolean;
-    };
-    message: string;
-    status: number;
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
   }>({
     url: endpoints.LOGIN,
     method: "post",
@@ -77,9 +71,8 @@ export default function LoginPage() {
     const { response, error } = await loginMutation.mutate(
       { body: { username, password } },
       {
-        onSuccess(result) {
-          if (result.data.is_lock) Toast.error("Your account has been locked");
-          else Toast.success("Login successfully");
+        onSuccess() {
+          Toast.success("Login successfully");
         },
       }
     );
@@ -88,11 +81,11 @@ export default function LoginPage() {
       handleApiError(error);
     }
 
-    if (response && !response.data.is_lock) {
+    if (response) {
       dispatch(
         actionLogin({
-          access_token: response.data.access,
-          refresh_token: response.data.refresh,
+          access_token: response.access_token,
+          refresh_token: response.refresh_token,
         })
       );
       dispatch(actionFetchUser());

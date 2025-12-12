@@ -1,9 +1,12 @@
 export interface IUser {
-  id: number;
-  username: string;
+  avatar_url: string | null;
+  created_at: Date;
   email: string;
-  full_name: string | null;
-  is_lock: boolean;
-  is_superuser: boolean;
-  is_staff: boolean;
+  full_name: string;
+  id: string;
+  is_active: boolean;
+  last_login_at: Date;
+  role: string;
+  updated_at: Date;
+  username: string;
 }

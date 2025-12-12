@@ -1,7 +1,9 @@
+import { endpoints } from "@/services/endpoints";
+import { useMutation } from "@/services/useMutation";
 import { Ionicons } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import { LinearGradient } from "expo-linear-gradient";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import React, { useRef, useState } from "react";
 import {
   ActivityIndicator,
@@ -11,12 +13,60 @@ import {
   View,
 } from "react-native";
 
+type UploadFile = {
+  uri: string;
+  name: string;
+  type: string;
+};
+
 export default function ScreenShotDetail() {
+  const { id } = useLocalSearchParams();
+
   const [facing, setFacing] = useState<CameraType>("back");
   const [permission, requestPermission] = useCameraPermissions();
-  const [capturedPhotos, setCapturedPhotos] = useState<string[]>([]);
   const [isCapturing, setIsCapturing] = useState(false);
   const cameraRef = useRef<CameraView>(null);
+
+  const invoiceMutation = useMutation({
+    url: `${endpoints.INVOICES}/r`,
+    method: "post",
+  });
+
+  const handleCapture = async () => {
+    if (isCapturing || !cameraRef.current || invoiceMutation.pending) return;
+
+    try {
+      setIsCapturing(true);
+
+      const photo = await cameraRef.current.takePictureAsync({
+        quality: 0.8,
+      });
+
+      if (!photo?.uri) return;
+
+      const formData = new FormData();
+      formData.append("category_id", String(id));
+      const file: { uri: string; name: string; type: string } = {
+        uri: photo.uri,
+        name: `invoice_${Date.now()}.jpg`,
+        type: "image/jpeg",
+      };
+
+      formData.append("file", file as unknown as Blob);
+
+      invoiceMutation.mutate({
+        body: formData,
+      });
+    } catch (error) {
+      console.error("Error taking picture:", error);
+    } finally {
+      setIsCapturing(false);
+    }
+  };
+
+  const toggleCameraFacing = () => {
+    setFacing((current) => (current === "back" ? "front" : "back"));
+  };
 
   // Handle camera permission
   if (!permission) {
@@ -57,27 +107,7 @@ export default function ScreenShotDetail() {
     );
   }
 
-  const handleCapture = async () => {
-    if (isCapturing || !cameraRef.current) return;
-
-    try {
-      setIsCapturing(true);
-      const photo = await cameraRef.current.takePictureAsync({
-        quality: 0.8,
-      });
-      if (photo?.uri) {
-        setCapturedPhotos((prev) => [...prev, photo.uri]);
-      }
-    } catch (error) {
-      console.error("Error taking picture:", error);
-    } finally {
-      setIsCapturing(false);
-    }
-  };
-
-  const toggleCameraFacing = () => {
-    setFacing((current) => (current === "back" ? "front" : "back"));
-  };
+  console.log(invoiceMutation.pending);
 
   return (
     <View className="flex-1 bg-black">
@@ -90,7 +120,7 @@ export default function ScreenShotDetail() {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={{
-          position: 'absolute',
+          position: "absolute",
           top: 0,
           left: 0,
           right: 0,
@@ -105,9 +135,7 @@ export default function ScreenShotDetail() {
             <Text className="text-lg font-bold text-white mb-1">
               Coop-Mart Hai Châu
             </Text>
-            <Text className="text-sm text-white opacity-90">
-              Bảng kê TPTS
-            </Text>
+            <Text className="text-sm text-white opacity-90">Bảng kê TPTS</Text>
           </View>
           <TouchableOpacity className="w-11 h-11 rounded-xl bg-white/20 justify-center items-center">
             <Ionicons name="grid-outline" size={24} color="#FFFFFF" />
@@ -158,13 +186,6 @@ export default function ScreenShotDetail() {
             <View className="w-[72px] h-[72px] rounded-full bg-white justify-center items-center border-4 border-white/30">
               <View className="w-[60px] h-[60px] rounded-full bg-white" />
             </View>
-            {capturedPhotos.length > 0 && (
-              <View className="absolute -top-2 -right-2 bg-red-500 rounded-xl min-w-6 h-6 justify-center items-center px-1.5 border-2 border-white">
-                <Text className="text-xs font-bold text-white">
-                  {capturedPhotos.length}
-                </Text>
-              </View>
-            )}
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -197,11 +218,7 @@ export default function ScreenShotDetail() {
             onPress={toggleCameraFacing}
             activeOpacity={0.8}
           >
-            <Ionicons
-              name="camera-reverse-outline"
-              size={24}
-              color="#FFFFFF"
-            />
+            <Ionicons name="camera-reverse-outline" size={24} color="#FFFFFF" />
           </TouchableOpacity>
         </View>
       </View>

@@ -17,6 +17,7 @@ export const endpoints = getEndPoint("api/v1", {
   LOGIN: "auth/login",
   LOGOUT: "auth/logout",
   REFRESH: "auth/refresh",
-  ROLE: "role",
+  CATEGORIES: "categories",
   USERS: "users",
+  INVOICES: "invoices",
 });

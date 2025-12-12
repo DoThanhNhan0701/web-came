@@ -44,8 +44,6 @@ axiosInstance.interceptors.response.use(
     ) {
       try {
         const refreshToken = await getToken(REFRESH_TOKEN);
-        console.log(refreshToken, "resfressToken");
-
         if (!refreshToken || typeof refreshToken !== "string") {
           logoutCallback?.();
           throw error(new Error("Session expired. Please login again."));

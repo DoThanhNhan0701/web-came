@@ -1,4 +1,7 @@
-import { invoiceTypes } from "@/constants/data";
+import { ICONS } from "@/assets/vector-icons";
+import { endpoints } from "@/services/endpoints";
+import { useGet } from "@/services/requestData";
+import { ICategories } from "@/types/ICategories";
 import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import React from "react";
@@ -13,33 +16,48 @@ export interface IInvoice {
 }
 
 export default function ListInvoice() {
-  const handleRedirectCamera = (id: string) => {
+  const categoriesData = useGet<ICategories[]>(
+    { url: `${endpoints.CATEGORIES}/` },
+    { deps: [] }
+  );
+
+  const handleRedirectCamera = (id: number) => {
     router.push(`/(default)/${id}`);
   };
 
-  const renderItem = ({ item }: { item: IInvoice }) => (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      className="bg-white rounded-2xl mb-3"
-      onPress={() => handleRedirectCamera(item.id)}
-    >
-      <View className="flex-row items-center p-4">
-        <View className="mr-4">
-          <View className="size-12 bg-primary justify-center items-center rounded-xl">
-            <Ionicons name={item.icon as any} size={24} color="#FFFFFF" />
+  const renderItem = ({
+    item,
+    index,
+  }: {
+    item: ICategories;
+    index: number;
+  }) => {
+    const iconName = ICONS[index] ?? "apps-outline";
+
+    return (
+      <TouchableOpacity
+        activeOpacity={0.7}
+        className="bg-white rounded-2xl mb-3"
+        onPress={() => handleRedirectCamera(item.id)}
+      >
+        <View className="flex-row items-center p-4">
+          <View className="mr-4">
+            <View className="size-12 bg-primary justify-center items-center rounded-xl">
+              <Ionicons name={iconName} size={24} color="#FFFFFF" />
+            </View>
+          </View>
+          <View className="flex-1">
+            <Text className="text-base font-semibold text-[#1F2937]">
+              {item.name}
+            </Text>
+          </View>
+          <View>
+            <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
           </View>
         </View>
-        <View className="flex-1">
-          <Text className="text-base font-semibold text-[#1F2937]">
-            {item.name}
-          </Text>
-        </View>
-        <View>
-          <Ionicons name="chevron-forward" size={20} color="#9CA3AF" />
-        </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View className="flex-1">
@@ -57,9 +75,9 @@ export default function ListInvoice() {
       </View>
 
       <FlatList
-        data={invoiceTypes}
+        data={categoriesData?.response ?? []}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         contentContainerClassName="p-4"
         showsVerticalScrollIndicator={false}
       />

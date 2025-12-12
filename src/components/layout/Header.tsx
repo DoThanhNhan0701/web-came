@@ -30,10 +30,10 @@ export default function Header() {
         <View className="flex-row justify-between items-center">
           <View className="flex-1">
             <Text className="text-lg font-bold text-white mb-1">
-              {user?.email}
+              {user?.location?.address}
             </Text>
             <Text className="text-sm text-white opacity-90">
-              {user?.full_name}
+              {user?.location?.code}
             </Text>
           </View>
           <Pressable

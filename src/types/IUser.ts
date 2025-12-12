@@ -1,3 +1,5 @@
+import { ILocation } from "./ILocation";
+
 export interface IUser {
   avatar_url: string | null;
   created_at: Date;
@@ -9,4 +11,5 @@ export interface IUser {
   role: string;
   updated_at: Date;
   username: string;
+  location: ILocation;
 }

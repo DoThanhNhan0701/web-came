@@ -109,7 +109,7 @@ export default function SearchSelect({
               value={query}
               onChangeText={setQuery}
               placeholder={searchPlaceholder}
-              className="h-9 text-[15px]"
+              className="h-9 text-[15px] py-0"
               autoFocus
             />
           </View>
